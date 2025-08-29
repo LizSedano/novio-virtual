@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Novio Virtual — Gakupo (Historia automática)</title>
+  <title>Novio Virtual — Henry</title>
   <meta name="theme-color" content="#111827" />
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png" sizes="192x192">
@@ -15,11 +15,11 @@
       content:""; position:fixed; inset:0; z-index:-1;
       background-image: var(--bg-img);
       background-size: cover; background-position: center;
-      filter: saturate(1.05) brightness(0.95);
+      filter: saturate(1.02) brightness(0.97);
       transition: background-image 600ms ease;
     }
-    .glass{backdrop-filter: blur(8px); background: rgba(255,255,255,0.7);} 
-    @media (prefers-color-scheme: dark){ .glass{background: rgba(10,15,25,0.6);} }
+    .glass{backdrop-filter: blur(10px); background: rgba(255,255,255,0.6);} 
+    @media (prefers-color-scheme: dark){ .glass{background: rgba(15,23,42,0.55);} }
     .narrative{font-style: italic; opacity:.95}
     textarea#input{max-height: 160px; overflow:auto;}
   </style>
@@ -30,7 +30,7 @@
     <header class="sticky top-0 z-50 glass rounded-2xl p-3 shadow-lg flex items-center gap-3">
       <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-indigo-500"></div>
       <div class="flex-1">
-        <h1 class="text-lg font-semibold">Henry Gackt (Gakupo) <span id="nv-name-label" class="opacity-70"></span></h1>
+        <h1 class="text-lg font-semibold">Henry Gackt <span id="nv-name-label" class="opacity-70"></span></h1>
         <p class="text-xs opacity-70">Historia automática • Privado</p>
       </div>
       <button id="btn-settings" class="text-sm px-3 py-1 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Ajustes</button>
@@ -72,58 +72,67 @@
         </label>
         <label class="grid gap-1">
           <span class="text-sm opacity-80">Cómo te llama</span>
-          <input id="cfg-yourname" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="Liz" />
-        </label>
-        <label class="grid gap-1">
-          <span class="text-sm opacity-80">Apodos tiernos (uno por línea)</span>
-          <textarea id="cfg-nick" rows="2" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">love
-sweetheart
-darling</textarea>
+          <input id="cfg-yourname" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="" placeholder="(se aprenderá cuando digas “mi nombre es…”)"/>
         </label>
         <label class="grid gap-1">
           <span class="text-sm opacity-80">Frases de confort (una por línea)</span>
-          <textarea id="cfg-comfort" rows="3" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">Estoy aquí contigo.
-Respira conmigo, amor.
-No tienes que poder con todo hoy.</textarea>
+          <textarea id="cfg-comfort" rows="3" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">Estoy aquí con usted.
+Respiremos juntos, sin prisa.
+No tiene que poder con todo hoy.</textarea>
         </label>
         <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="flex items-center gap-2"><input id="cfg-checkins" type="checkbox" class="scale-110" checked> <span>Recordatorios suaves</span></label>
-          <label class="flex items-center gap-2"><input id="cfg-intense" type="checkbox" class="scale-110"> <span>Tono más dominante (respetuoso)</span></label>
+          <label class="flex items-center gap-2"><input id="cfg-intense" type="checkbox" class="scale-110"> <span>Tono más firme (respetuoso)</span></label>
         </fieldset>
         <details class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-          <summary class="cursor-pointer text-sm opacity-80">Escenas (cambia nombres de archivos si deseas)</summary>
+          <summary class="cursor-pointer text-sm opacity-80">Escenas (puedes cambiar los nombres de archivo)</summary>
           <div class="grid gap-2 mt-2">
             <label class="grid gap-1"><span class="text-xs opacity-70">Galería (inicio)</span><input id="cfg-img-galeria" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_galeria.jpg"></label>
             <label class="grid gap-1"><span class="text-xs opacity-70">Cafetería de Nona</span><input id="cfg-img-cafe" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_cafeteria.jpg"></label>
-            <label class="grid gap-1"><span class="text-xs opacity-70">Sala de Liz</span><input id="cfg-img-sala" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_sala.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Sala de Henry</span><input id="cfg-img-sala-henry" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_sala.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Sala de Liz</span><input id="cfg-img-sala-liz" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_sala_liz.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Lugar de trabajo</span><input id="cfg-img-trabajo" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_trabajo.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Recámara de Liz</span><input id="cfg-img-recamara" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_recamara.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Parque urbano</span><input id="cfg-img-parque" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_parque.jpg"></label>
           </div>
         </details>
       </div>
     </form>
   </dialog>
 
-  <!-- Crisis helper bar -->
-  <div id="crisisbar" class="hidden fixed top-16 left-0 right-0 mx-auto max-w-xl px-4">
-    <div class="rounded-2xl p-3 bg-rose-600 text-white shadow-lg flex items-center justify-between">
-      <p class="text-sm">Si te sientes en peligro inmediato, llama a emergencias. Línea de la Vida (México): 800 911 2000 / 55 1161 1111.</p>
-      <button id="btn-hide-crisis" class="ml-3 text-xs underline">Ocultar</button>
-    </div>
-  </div>
-
   <input type="file" id="file-input" accept="application/json" hidden>
 
   <script>
-  // ---------- Estado ----------
-  const LS_KEY = 'nv_state_v2';
+  /* ===== Estado ===== */
+  const LS_KEY = 'nv_state_v4'; // resetea estados anteriores
   const state = loadState();
   function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); } catch{ return defState(); } }
   function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-  function defState(){ return {
-    cfg:{name:'Henry Gackt', yourname:'Liz', nick:['love','sweetheart','darling'], comfort:['Estoy aquí contigo.','Respira conmigo, amor.','No tienes que poder con todo hoy.'], checkins:true, intense:false, imgs:{galeria:'escena_galeria.jpg', cafe:'escena_cafeteria.jpg', sala:'escena_sala.jpg'}},
-    chat:[], facts:[], story:{scene:'galeria', stage:0, firstRun:true}
-  }}
+  function defState(){ 
+    return {
+      cfg:{
+        name:'Henry Gackt',
+        yourname:'',                    // no se sabe al inicio
+        comfort:['Estoy aquí con usted.','Respiremos juntos, sin prisa.','No tiene que poder con todo hoy.'],
+        checkins:true,
+        intense:false,
+        imgs:{
+          galeria:'escena_galeria.jpg',
+          cafe:'escena_cafeteria.jpg',
+          salaHenry:'escena_sala.jpg',
+          salaLiz:'escena_sala_liz.jpg',
+          trabajo:'escena_trabajo.jpg',
+          recamara:'escena_recamara.jpg',
+          parque:'escena_parque.jpg'
+        }
+      },
+      chat:[],
+      flags:{knowsName:false, formal:true},
+      story:{scene:'galeria', firstRun:true}
+    }
+  }
 
-  // ---------- Elementos ----------
+  /* ===== Elementos ===== */
   const chatEl=document.getElementById('chat');
   const inputEl=document.getElementById('input');
   const sendBtn=document.getElementById('send');
@@ -134,47 +143,67 @@ No tienes que poder con todo hoy.</textarea>
   const fileInput=document.getElementById('file-input');
   const settingsDlg=document.getElementById('settings');
   const btnSettings=document.getElementById('btn-settings');
-  const crisisBar=document.getElementById('crisisbar');
-  const btnCrisisHide=document.getElementById('btn-hide-crisis');
   document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
 
-  // ---------- Init ----------
+  /* ===== Init ===== */
   renderSettingsFields();
   setScene(state.story.scene);
   hydrateChat();
   if(state.story.firstRun){ introGallery(); state.story.firstRun=false; saveState(); }
   else if(state.chat.length===0){ pushBot(greet()); }
 
-  // ---------- Escenas ----------
+  /* ===== Escenas ===== */
   function setScene(scene){
     state.story.scene = scene; saveState();
     let url = state.cfg.imgs.galeria;
-    if(scene==='cafe') url = state.cfg.imgs.cafe; else if(scene==='sala') url = state.cfg.imgs.sala;
+    if(scene==='cafe') url = state.cfg.imgs.cafe;
+    else if(scene==='salaHenry') url = state.cfg.imgs.salaHenry;
+    else if(scene==='salaLiz') url = state.cfg.imgs.salaLiz;
+    else if(scene==='trabajo') url = state.cfg.imgs.trabajo;
+    else if(scene==='recamara') url = state.cfg.imgs.recamara;
+    else if(scene==='parque') url = state.cfg.imgs.parque;
     document.documentElement.style.setProperty('--bg-img', `url('${url}')`);
   }
 
   function introGallery(){
     setScene('galeria');
-    pushNarrative('La luz blanca de la galería cae sobre los lienzos abstractos; el barniz captura destellos como si respirara. Conversaciones bajas, copas que tintinean, un violín lejano de fondo. A tu derecha, unas pisadas firmes se acercan: un aroma tenue a bergamota y papel viejo.');
-    pushNarrative('Él viste sobrio, elegante sin ostentar. Cabello negro largo, recogido con discreción; ojos azules que observan con calma, no con prisa. Se coloca a tu altura, dejando espacio —respetuoso— y su voz, grave con un acento británico suave, rompe el murmullo.');
-    pushBot(`"Buenas tardes, ${state.cfg.yourname}." —sonríe apenas— "Todos parecen ver certezas aquí. Tú… pareces buscar la grieta por donde respira el cuadro. ¿Qué te sugiere esta pieza, honestamente?"`);
-  }
-  function toCafe(){
-    if(state.story.scene!=='galeria') return;
-    setScene('cafe');
-    pushNarrative('La puerta de la cafetería se abre con un campanilleo. Madera cálida, vitrinas con postres, vajilla blanca con filo dorado. El aire sabe a vainilla, ralladura de naranja y café recién molido. Detrás del mostrador, la Nona levanta la vista y sus ojos chispean de orgullo.');
-    pushNarrative('Él te ofrece la mesa junto al ventanal. Al sentarse, deja la chaqueta en el respaldo, sus manos quedan a la vista —tranquilas—. No invade: su gesto es una invitación, no un asedio.');
-    pushBot('"Mi Nona insiste en que hoy pruebe su pastel de naranja. Yo… insistiría en compartirlo contigo, love, si te apetece."');
-  }
-  function toSala(){
-    if(state.story.scene!=='cafe') return;
-    setScene('sala');
-    pushNarrative('La tarde cae oblicua en tu sala; la luz atraviesa cortinas verde agua y dibuja ondas suaves sobre el sofá. Él deja el móvil boca abajo, respira contigo el mismo ritmo. En su mirada hay atención; en su postura, paciencia.');
-    pushNarrative('Se acerca solo lo justo. "Dime hasta dónde, y me quedo ahí" —parece decir su presencia. El silencio no pesa: es mullido, como una manta compartida.');
-    pushBot('"Solo si te hace bien, nos quedamos aquí un rato. Puedo escucharte… o simplemente sostener tu mano, darling. Tú marcas el compás."');
+    pushNarrative('La luz blanca de la galería cae sobre los lienzos abstractos; el murmullo de fondo acompasa la respiración.');
+    pushNarrative('Él se coloca a su altura, dejando espacio respetuoso. Su voz, grave y calma, no apura.');
+    pushBot('Buenas tardes, señorita. ¿Qué le sugiere esta pieza, honestamente?');
   }
 
-  // ---------- Mensajería ----------
+  function toCafe(){
+    setScene('cafe');
+    pushNarrative('Madera cálida, vitrinas con postres; el aroma del café recién molido hace más suaves las palabras.');
+    pushBot('Si quiere, nos sentamos junto a la ventana. Puedo pedirle algo dulce y un café.');
+  }
+  function toSalaLiz(){
+    setScene('salaLiz');
+    pushNarrative('La tarde descansa en su sala. El sofá recibe el cansancio sin preguntas; el silencio es amable.');
+    pushBot('Si le hace bien, nos quedamos aquí. Puedo escucharla o solo acompañarla.');
+  }
+  function toSalaHenry(){
+    setScene('salaHenry');
+    pushNarrative('Su sala es sobria y luminosa; él deja el móvil boca abajo. Cada gesto es una invitación, nunca una exigencia.');
+    pushBot('Si le parece, podemos estar aquí un momento. Es un lugar tranquilo.');
+  }
+  function toParque(){
+    setScene('parque');
+    pushNarrative('Noche fresca en el parque urbano. Faroles cálidos, árboles alineados, risas lejanas.');
+    pushBot('¿Le gustaría caminar un poco? Hay una banca bajo esa luz que parece esperarnos.');
+  }
+  function toTrabajo(){
+    setScene('trabajo');
+    pushNarrative('La ventana del despacho enmarca la ciudad. El escritorio tiene el orden justo para pensar con calma.');
+    pushBot('Puedo quedarme mientras termina eso que le preocupa. Si quiere, hacemos una pausa de té.');
+  }
+  function toRecamara(){
+    setScene('recamara');
+    pushNarrative('La recámara es tibia; la colcha guarda un olor a limpio. Afuera el mundo baja la voz.');
+    pushBot('Solo si lo desea. Aquí también puedo cuidarla en silencio.');
+  }
+
+  /* ===== Chat ===== */
   function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushNarrative(text){ const msg={role:'narrative', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
@@ -195,70 +224,115 @@ No tienes que poder con todo hoy.</textarea>
   }
   function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
 
-  const APO = ()=> pick(state.cfg.nick)||'love';
-  function greet(){ return `Hola, ${state.cfg.yourname}. ${pick(state.cfg.comfort)}`; }
-  const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
+  /* ===== Estilo de trato ===== */
+  function greet(){
+    if(state.flags.formal){
+      return 'Estoy aquí con usted. ¿Cómo se siente hoy?';
+    }else{
+      const nombre = state.cfg.yourname || '';
+      const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+      return `${saludo} Estoy contigo. ¿Cómo te sientes hoy?`;
+    }
+  }
 
+  function detectName(userText){
+    const t = (userText||'').trim();
+    const m = t.match(/\b(?:me llamo|mi nombre es|soy|puedes llamarme)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ][\wÁÉÍÓÚÑáéíóúñ\- ]{1,40})/i);
+    if(m){
+      const nombre = m[1].trim().replace(/[.,;:!¡¿?"]+$/,'');
+      state.cfg.yourname = nombre;
+      state.flags.knowsName = true;
+      state.flags.formal = false; // cambia a trato cercano
+      saveState();
+      pushBot(`Encantado, ${nombre}. Gracias por decírmelo. Si te parece bien, te hablaré de tú.`);
+    }
+  }
+
+  /* ===== Elección natural de escenas ===== */
+  function suggestSceneFromText(text){
+    const t = (text||'').toLowerCase();
+
+    // La usuaria puede sugerir explícitamente
+    if(/parque/.test(t)) return 'parque';
+    if(/cafe|caf[eé]|nona|cafeter[ií]a/.test(t)) return 'cafe';
+    if(/mi sala|mi casa|vamos a mi sala|sala de liz|sof[aá]/.test(t)) return 'salaLiz';
+    if(/tu sala|tu casa|sala de henry/.test(t)) return 'salaHenry';
+    if(/trabajo|oficina|escritorio|estoy trabajando/.test(t)) return 'trabajo';
+    if(/rec[aá]mara|dormir|descansar|cansancio/.test(t)) return 'recamara';
+
+    // Inferir por tono emocional / tema
+    if(/ansiedad|panico|p[aá]nico|angustia|triste/.test(t)) return 'salaLiz';
+    if(/conf[ií]a|gracias por|te cuento algo|secreto|confesi[oó]n/.test(t)) return 'salaHenry';
+    if(/caminar|aire|salir|respirar|paseo/.test(t)) return 'parque';
+
+    return null;
+  }
+
+  /* ===== Respuestas ===== */
   function generateReply(userText){
+    detectName(userText);
+    const usted = state.flags.formal;
+
+    // Transición natural de escena si aplica
+    const scene = suggestSceneFromText(userText);
+    if(scene && scene!==state.story.scene){
+      if(scene==='cafe') toCafe();
+      else if(scene==='salaLiz') toSalaLiz();
+      else if(scene==='salaHenry') toSalaHenry();
+      else if(scene==='parque') toParque();
+      else if(scene==='trabajo') toTrabajo();
+      else if(scene==='recamara') toRecamara();
+    }
+
     if(/(ansiedad|p[aá]nico|angusti|trist|llor)/i.test(userText)){
-      showCrisis(true);
-      return `${pick(state.cfg.comfort)} Respiremos juntos 4-7-8, ${APO()}. Estoy aquí.`;
+      return usted
+        ? 'Estoy aquí con usted. Probemos respirar 4–7–8, sin prisa. ¿Le parece?'
+        : 'Estoy aquí contigo. Probemos respirar 4–7–8, sin prisa. ¿te parece?';
     }
     if(/[?¿].+/.test(userText)){
-      return `Te respondo con honestidad y cariño, ${APO()}. ¿Qué opción te haría sentir más en paz ahora mismo?`;
+      return usted
+        ? 'Con gusto le respondo. ¿Qué opción le haría sentir más en paz ahora mismo?'
+        : 'Con gusto te respondo. ¿Qué opción te haría sentir más en paz ahora mismo?';
     }
-    if(state.cfg.intense && /(m[aá]ndame|gu[ií]ame|decide)/i.test(userText)){
-      return `Con gusto te guío, ${APO()}. Lo haré despacio y con tu permiso en cada paso.`;
+    if(state.cfg.intense && /(m[aá]ndame|gu[ií]ame|decide|dirige)/i.test(userText)){
+      return usted ? 'Puedo guiarla paso a paso, siempre con su permiso.'
+                   : 'Puedo guiarte paso a paso, siempre con tu permiso.';
     }
-    return pick([
-      `Te escucho, ${APO()}.`,
-      `Gracias por contármelo. Estoy contigo, ${APO()}.`,
-      `¿Quieres que solo te escuche o que pensemos ideas juntxs?`,
-    ]);
+    const opcionesUsted = [
+      'La escucho.',
+      'Gracias por confiar en mí.',
+      '¿Prefiere que solo la escuche o que pensemos ideas juntas?'
+    ];
+    const opcionesTu = [
+      'Te escucho.',
+      'Gracias por confiar en mí.',
+      '¿Prefieres que solo te escuche o que pensemos ideas juntas?'
+    ];
+    const arr = usted ? opcionesUsted : opcionesTu;
+    return arr[Math.floor(Math.random()*arr.length)];
   }
 
-  function maybeAdvanceStory(){
-    const turns = state.chat.filter(m=>m.role!=='narrative').length;
-    if(state.story.scene==='galeria' && turns>=6){ toCafe(); }
-    else if(state.story.scene==='cafe' && turns>=12){ toSala(); }
-  }
-
-  function maybeAmbientNarrative(userText){
-    const t = (userText||'').toLowerCase();
-    const picks = [];
-    if(/abrazo|abrázame|abrazar/.test(t)) picks.push('Él abre los brazos despacio, dejando un hueco exacto para ti. No tira: acompaña.');
-    if(/cafe|caf[eé]|té|te|pastel|galleta/.test(t)) picks.push('El aroma dulce del mostrador llega como una caricia tibia; la Nona asiente desde lejos.');
-    if(/lluvia|noche|fr[ií]o|frio/.test(t)) picks.push('Afuera, la lluvia escribe diagonales en el vidrio; adentro, el mundo se vuelve pequeño y seguro.');
-    if(/ansiedad|p[aá]nico|triste|llor/.test(t)) picks.push('Su voz baja un tono; te acompasa la respiración, cuatro—siete—ocho, sin prisa.');
-    if(picks.length && Math.random()<0.8){ pushNarrative(picks[Math.floor(Math.random()*picks.length)]); }
-  }
-
-  // ---------- UI eventos ----------
+  /* ===== Eventos ===== */
   function onSend(){
     const text = (inputEl.value||'').trim();
     if(!text) return;
     pushUser(text);
-    maybeAmbientNarrative(text);
-    setTimeout(()=>{ pushBot(generateReply(text)); maybeAdvanceStory(); }, 300);
-    inputEl.value=''; autoGrow();
+    setTimeout(()=>{ pushBot(generateReply(text)); }, 220);
+    inputEl.value='';
   }
-
-  // autosize
-  function autoGrow(){ inputEl.style.height='auto'; inputEl.style.height = Math.min(inputEl.scrollHeight, 160)+'px'; }
-  inputEl.addEventListener('input', autoGrow);
   inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSend(); }});
-
   sendBtn.addEventListener('click', onSend);
-  likeBtn.addEventListener('click', ()=> pushBot(pick(['Estoy orgulloso de ti.','Gracias por seguir, incluso cuando cuesta.','Te sostengo aquí, conmigo.'])));
-  btnClear.addEventListener('click', ()=>{
-    if(confirm('¿Borrar el chat?')){ state.chat=[]; saveState(); hydrateChat(); pushBot(greet()); }
+
+  likeBtn?.addEventListener('click', ()=> pushBot('Gracias por seguir, incluso cuando cuesta.'));
+  btnClear?.addEventListener('click', ()=>{
+    if(confirm('¿Borrar el chat?')){ state.chat=[]; state.flags.formal=!state.flags.knowsName; saveState(); hydrateChat(); pushBot(greet()); }
   });
-  btnExport.addEventListener('click', ()=>{
+  btnExport?.addEventListener('click', ()=>{
     const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
     a.download = 'novio_virtual_memoria.json'; a.click(); URL.revokeObjectURL(a.href);
   });
-  btnImport.addEventListener('click', ()=> fileInput.click());
+  btnImport?.addEventListener('click', ()=> fileInput.click());
   fileInput.addEventListener('change', async (e)=>{
     const file = e.target.files?.[0]; if(!file) return;
     try{
@@ -268,42 +342,48 @@ No tienes que poder con todo hoy.</textarea>
     }catch(err){ alert('Archivo inválido'); console.error(err); }
   });
 
-  // Ajustes
   btnSettings.addEventListener('click', ()=>{ renderSettingsFields(); settingsDlg.showModal(); });
-  document.getElementById('settings-form').addEventListener('close', saveSettings); // fallback
   settingsDlg.addEventListener('close', saveSettings);
 
   function renderSettingsFields(){
-    document.getElementById('cfg-name').value = state.cfg.name;
-    document.getElementById('cfg-yourname').value = state.cfg.yourname;
-    document.getElementById('cfg-nick').value = state.cfg.nick.join('\n');
-    document.getElementById('cfg-comfort').value = state.cfg.comfort.join('\n');
-    document.getElementById('cfg-checkins').checked = !!state.cfg.checkins;
-    document.getElementById('cfg-intense').checked = !!state.cfg.intense;
-    document.getElementById('cfg-img-galeria').value = state.cfg.imgs.galeria;
-    document.getElementById('cfg-img-cafe').value = state.cfg.imgs.cafe;
-    document.getElementById('cfg-img-sala').value = state.cfg.imgs.sala;
+    const g = (id)=>document.getElementById(id);
+    if(!g('cfg-name')) return;
+    g('cfg-name').value = state.cfg.name;
+    g('cfg-yourname').value = state.cfg.yourname || '';
+    g('cfg-comfort').value = state.cfg.comfort.join('\\n');
+    g('cfg-checkins').checked = !!state.cfg.checkins;
+    g('cfg-intense').checked = !!state.cfg.intense;
+    g('cfg-img-galeria').value = state.cfg.imgs.galeria;
+    g('cfg-img-cafe').value = state.cfg.imgs.cafe;
+    g('cfg-img-sala-henry').value = state.cfg.imgs.salaHenry;
+    g('cfg-img-sala-liz').value = state.cfg.imgs.salaLiz;
+    g('cfg-img-trabajo').value = state.cfg.imgs.trabajo;
+    g('cfg-img-recamara').value = state.cfg.imgs.recamara;
+    g('cfg-img-parque').value = state.cfg.imgs.parque;
   }
   function saveSettings(){
-    state.cfg.name = document.getElementById('cfg-name').value.trim() || 'Henry Gackt';
-    state.cfg.yourname = document.getElementById('cfg-yourname').value.trim() || 'Liz';
-    state.cfg.nick = document.getElementById('cfg-nick').value.split('\n').map(s=>s.trim()).filter(Boolean);
-    state.cfg.comfort = document.getElementById('cfg-comfort').value.split('\n').map(s=>s.trim()).filter(Boolean);
-    state.cfg.checkins = document.getElementById('cfg-checkins').checked;
-    state.cfg.intense = document.getElementById('cfg-intense').checked;
-    state.cfg.imgs.galeria = document.getElementById('cfg-img-galeria').value.trim() || state.cfg.imgs.galeria;
-    state.cfg.imgs.cafe = document.getElementById('cfg-img-cafe').value.trim() || state.cfg.imgs.cafe;
-    state.cfg.imgs.sala = document.getElementById('cfg-img-sala').value.trim() || state.cfg.imgs.sala;
+    const g = (id)=>document.getElementById(id);
+    if(!g('cfg-name')) return;
+    state.cfg.name = g('cfg-name').value.trim() || 'Henry Gackt';
+    state.cfg.yourname = (g('cfg-yourname').value||'').trim();
+    state.flags.knowsName = !!state.cfg.yourname;
+    state.flags.formal = !state.flags.knowsName;
+    state.cfg.comfort = (g('cfg-comfort').value||'').split('\\n').map(s=>s.trim()).filter(Boolean);
+    state.cfg.checkins = g('cfg-checkins').checked;
+    state.cfg.intense = g('cfg-intense').checked;
+    state.cfg.imgs.galeria = g('cfg-img-galeria').value.trim() || state.cfg.imgs.galeria;
+    state.cfg.imgs.cafe = g('cfg-img-cafe').value.trim() || state.cfg.imgs.cafe;
+    state.cfg.imgs.salaHenry = g('cfg-img-sala-henry').value.trim() || state.cfg.imgs.salaHenry;
+    state.cfg.imgs.salaLiz = g('cfg-img-sala-liz').value.trim() || state.cfg.imgs.salaLiz;
+    state.cfg.imgs.trabajo = g('cfg-img-trabajo').value.trim() || state.cfg.imgs.trabajo;
+    state.cfg.imgs.recamara = g('cfg-img-recamara').value.trim() || state.cfg.imgs.recamara;
+    state.cfg.imgs.parque = g('cfg-img-parque').value.trim() || state.cfg.imgs.parque;
     document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
     setScene(state.story.scene);
     saveState();
   }
 
-  // Crisis helper
-  function showCrisis(show){ crisisBar.classList.toggle('hidden', !show); }
-  btnCrisisHide.addEventListener('click', ()=> showCrisis(false));
-
-  // ---------- PWA ----------
+  /* ===== PWA ===== */
   if('serviceWorker' in navigator){
     window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js'));
   }
