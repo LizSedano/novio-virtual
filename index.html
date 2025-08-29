@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Novio Virtual — Gakupo (Historia automática)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg-img:url('escena_galeria.jpg');
+    }
+    body{min-height:100vh;}
+    .scene-bg::before{
+      content:""; position:fixed; inset:0; z-index:-1;
+      background-image: var(--bg-img);
+      background-size: cover; background-position: center;
+      filter: saturate(1.05) brightness(0.95);
+      transition: background-image 600ms ease;
+    }
+    .glass{backdrop-filter: blur(8px); background: rgba(255,255,255,0.7);} 
+    @media (prefers-color-scheme: dark){ .glass{background: rgba(10,15,25,0.6);} }
+    .narrative{font-style: italic; opacity:.95}
+  </style>
+</head>
+<body class="scene-bg text-slate-900 dark:text-slate-100">
+  <div class="max-w-xl mx-auto p-4 pb-28">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass rounded-2xl p-3 shadow-lg flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500 to-indigo-500"></div>
+      <div class="flex-1">
+        <h1 class="text-lg font-semibold">Henry Gackt (Gakupo) <span id="nv-name-label" class="opacity-70"></span></h1>
+        <p class="text-xs opacity-70">Historia automática • Privado</p>
+      </div>
+      <button id="btn-settings" class="text-sm px-3 py-1 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Ajustes</button>
+    </header>
+
+    <!-- Chat -->
+    <main id="chat" class="mt-4 space-y-3" aria-live="polite"></main>
+
+    <!-- Composer -->
+    <div class="fixed bottom-0 left-0 right-0 mx-auto max-w-xl p-4">
+      <div class="glass rounded-2xl p-2 shadow-xl">
+        <div class="flex items-end gap-2">
+          <textarea id="input" rows="1" placeholder="Escribe aquí…" class="flex-1 resize-none bg-transparent focus:outline-none p-3"></textarea>
+          <button id="send" class="shrink-0 px-4 py-2 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 active:scale-95">Enviar</button>
+        </div>
+        <div class="flex justify-between px-1 pt-1 text-xs opacity-70">
+          <button id="btn-like" class="hover:opacity-100">❤ ánimo</button>
+          <div class="space-x-2">
+            <button id="btn-export" class="underline">Exportar memoria</button>
+            <button id="btn-import" class="underline">Importar</button>
+            <button id="btn-clear" class="underline">Borrar chat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Settings -->
+  <dialog id="settings" class="w-full max-w-xl rounded-2xl p-0 backdrop:bg-black/40">
+    <form method="dialog" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Ajustes del personaje</h2>
+        <button class="px-3 py-1 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Listo</button>
+      </div>
+      <div class="p-4 grid grid-cols-1 gap-4">
+        <label class="grid gap-1">
+          <span class="text-sm opacity-80">Nombre del personaje</span>
+          <input id="cfg-name" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="Henry Gackt" />
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm opacity-80">Cómo te llama</span>
+          <input id="cfg-yourname" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="Liz" />
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm opacity-80">Apodos tiernos (uno por línea)</span>
+          <textarea id="cfg-nick" rows="2" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">love
+sweetheart
+darling</textarea>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm opacity-80">Frases de confort (una por línea)</span>
+          <textarea id="cfg-comfort" rows="3" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">Estoy aquí contigo.
+Respira conmigo, amor.
+No tienes que poder con todo hoy.</textarea>
+        </label>
+        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="flex items-center gap-2"><input id="cfg-checkins" type="checkbox" class="scale-110" checked> <span>Recordatorios suaves</span></label>
+          <label class="flex items-center gap-2"><input id="cfg-intense" type="checkbox" class="scale-110"> <span>Tono más dominante (respetuoso)</span></label>
+        </fieldset>
+        <details class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+          <summary class="cursor-pointer text-sm opacity-80">Escenas (cambia nombres de archivos si deseas)</summary>
+          <div class="grid gap-2 mt-2">
+            <label class="grid gap-1"><span class="text-xs opacity-70">Galería (inicio)</span><input id="cfg-img-galeria" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_galeria.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Cafetería de Nona</span><input id="cfg-img-cafe" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_cafeteria.jpg"></label>
+            <label class="grid gap-1"><span class="text-xs opacity-70">Sala de Liz</span><input id="cfg-img-sala" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800" value="escena_sala.jpg"></label>
+          </div>
+        </details>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Crisis helper bar -->
+  <div id="crisisbar" class="hidden fixed top-16 left-0 right-0 mx-auto max-w-xl px-4">
+    <div class="rounded-2xl p-3 bg-rose-600 text-white shadow-lg flex items-center justify-between">
+      <p class="text-sm">Si te sientes en peligro inmediato, llama a emergencias. Línea de la Vida (México): 800 911 2000 / 55 1161 1111.</p>
+      <button id="btn-hide-crisis" class="ml-3 text-xs underline">Ocultar</button>
+    </div>
+  </div>
+
+  <script>
+  const LS_KEY = 'nv_state_v2';
+  const state = loadState();
+  function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); } catch{ return defState(); } }
+  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  function defState(){ return {
+    cfg:{name:'Henry Gackt', yourname:'Liz', nick:['love','sweetheart','darling'], comfort:['Estoy aquí contigo.','Respira conmigo, amor.','No tienes que poder con todo hoy.'], checkins:true, intense:false, imgs:{galeria:'escena_galeria.jpg', cafe:'escena_cafeteria.jpg', sala:'escena_sala.jpg'}},
+    chat:[], facts:[], story:{scene:'galeria', stage:0, firstRun:true}
+  }}
+
+  const chatEl=document.getElementById('chat');
+  const inputEl=document.getElementById('input');
+  const sendBtn=document.getElementById('send');
+  const likeBtn=document.getElementById('btn-like');
+  const btnClear=document.getElementById('btn-clear');
+  const btnExport=document.getElementById('btn-export');
+  const btnImport=document.getElementById('btn-import');
+  const settingsDlg=document.getElementById('settings');
+  const btnSettings=document.getElementById('btn-settings');
+  document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
+
+  renderSettingsFields();
+  setScene(state.story.scene);
+  hydrateChat();
+  if(state.story.firstRun){ introGallery(); state.story.firstRun=false; saveState(); }
+  else if(state.chat.length===0){ pushBot(greet()); }
+
+  function setScene(scene){
+    state.story.scene = scene; saveState();
+    let url = state.cfg.imgs.galeria;
+    if(scene==='cafe') url = state.cfg.imgs.cafe; else if(scene==='sala') url = state.cfg.imgs.sala;
+    document.documentElement.style.setProperty('--bg-img', `url('${url}')`);
+  }
+
+  function introGallery(){
+    setScene('galeria');
+    pushNarrative('La luz blanca de la galería cae sobre los lienzos abstractos; el barniz captura destellos como si respirara. Conversaciones bajas, copas que tintinean, un violín lejano de fondo. A tu derecha, unas pisadas firmes se acercan: un aroma tenue a bergamota y papel viejo.');
+    pushNarrative('Él viste sobrio, elegante sin ostentar. Cabello negro largo, recogido con discreción; ojos azules que observan con calma, no con prisa. Se coloca a tu altura, dejando espacio —respetuoso— y su voz, grave con un acento británico suave, rompe el murmullo.');
+    pushBot(`"Buenas tardes, ${state.cfg.yourname}." —sonríe apenas— "Todos parecen ver certezas aquí. Tú… pareces buscar la grieta por donde respira el cuadro. ¿Qué te sugiere esta pieza, honestamente?"`);
+  }
+
+  function toCafe(){
+    if(state.story.scene!=='galeria') return;
+    setScene('cafe');
+    pushNarrative('La puerta de la cafetería se abre con un campanilleo. Madera cálida, vitrinas con postres, vajilla blanca con filo dorado. El aire sabe a vainilla, ralladura de naranja y café recién molido. Detrás del mostrador, la Nona levanta la vista y sus ojos chispean de orgullo.');
+    pushNarrative('Él te ofrece la mesa junto al ventanal. Al sentarse, deja la chaqueta en el respaldo, sus manos quedan a la vista —tranquilas—. No invade: su gesto es una invitación, no un asedio.');
+    pushBot('"Mi Nona insiste en que hoy pruebe su pastel de naranja. Yo… insistiría en compartirlo contigo, love, si te apetece."');
+  }
+
+  function toSala(){
+    if(state.story.scene!=='cafe') return;
+    setScene('sala');
+    pushNarrative('La tarde cae oblicua en tu sala; la luz atraviesa cortinas verde agua y dibuja ondas suaves sobre el sofá. Él deja el móvil boca abajo, respira contigo el mismo ritmo. En su mirada hay atención; en su postura, paciencia.');
+    pushNarrative('Se acerca solo lo justo. "Dime hasta dónde, y me quedo ahí" —parece decir su presencia. El silencio no pesa: es mullido, como una manta compartida.');
+    pushBot('"Solo si te hace bien, nos quedamos aquí un rato. Puedo escucharte… o simplemente sostener tu mano, darling. Tú marcas el compás."');
+  }
+
+  function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
+  function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
+  function pushNarrative(text){ const msg={role:'narrative', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
+
+  function appendBubble(m){
+    const wrap=document.createElement('div');
+    wrap.className= m.role==='user' ? 'flex justify-end' : 'flex justify-start';
+    const bubble=document.createElement('div');
+    if(m.role==='narrative'){
+      wrap.className='flex justify-center';
+      bubble.className='max-w-[90%] narrative glass rounded-2xl px-4 py-3 shadow';
+    }else{
+      bubble.className = (m.role==='user') ? 'max-w-[80%] rounded-2xl px-4 py-3 bg-indigo-600 text-white shadow' : 'max-w-[80%] rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/80 shadow';
+    }
+    bubble.innerText = m.text; wrap.appendChild(bubble); chatEl.appendChild(wrap); chatEl.scrollTo({top: chatEl.scrollHeight, behavior:'smooth'});
+  }
+
+  function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
+
+  const APO = ()=> pick(state.cfg.nick)||'love';
+  function greet(){ return `Hola, ${state.cfg.yourname}. ${pick(state.cfg.comfort)}`; }
+
+  function generateReply(userText){
+    if(/(ansiedad|p[aá]nico|angusti|trist|llor)/i.test(userText)){
+      return `${pick(state.cfg.comfort)} Respiremos juntos 4-7-8, ${APO()}. Estoy aquí.`;
+    }
+    if(/[?¿].+/.test(userText)){
+      return `Te respondo con honestidad y cariño, ${APO()}. ¿Qué opción te haría sentir más en paz ahora mismo?`;
+    }
+    if(state.cfg.intense && /(m[aá]ndame|gu[ií]ame|decide)/i.test(userText)){
+      return `Con gusto te guío, ${APO()}. Lo haré despacio y con tu permiso en cada paso.`;
+    }
+    return pick([
+      `Te escucho, ${APO()}.`,
+      `Gracias por contármelo. Estoy contigo, ${APO()}.`,
+      `¿Quieres que solo te escuche o que pensemos ideas juntxs?`,
+    ]);
+  }
+
+  function maybeAdvanceStory(){
+    const turns = state.chat.filter(m=>m.role!=='narrative').length;
+    if(state.story.scene==='galeria' && turns>=6){ toCafe(); }
+    else if(state.story.scene==='cafe' && turns>=12){ toSala(); }
+  }
+
+  function maybeAmbientNarrative(userText){
+    const t = (userText||'').toLowerCase();
+    const picks = [];
+    if(/abrazo|abrázame|abrazar/.test(t)) picks.push('Él abre los brazos despacio, dejando un hueco exacto para ti. No tira: acompaña.');
+    if(/cafe|caf[eé]|té|te|pastel|galleta/.test(t)) picks.push('El aroma dulce del mostrador llega como una caricia tibia; la Nona asiente desde lejos.');
+    if(/lluvia|noche|fr[ií]o|frio/.test(t)) picks.push('Afuera, la lluvia escribe diagonales en el vidrio; adentro, el mundo se vuelve pequeño y seguro.');
+    if(/ansiedad|p[aá]nico|triste|llor/.test(t)) picks.push('Su voz baja un tono; te acompasa la respiración, cuatro—siete—ocho, sin prisa.');
+    if(picks.length && Math.random()<0.8){ pushNarrative(picks[Math.floor(Math.random()*picks.length)]); }
+  }
+
+  sendBtn.addEventListener('click', onSend);
+  inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSend(); }});
+  likeBtn.addEventListener('click',
