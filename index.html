@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Novio Virtual — Gakupo (Historia automática)</title>
+  <meta name="theme-color" content="#111827" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root{
-      --bg-img:url('escena_galeria.jpg');
-    }
+    :root{ --bg-img:url('escena_galeria.jpg'); }
     body{min-height:100vh;}
     .scene-bg::before{
       content:""; position:fixed; inset:0; z-index:-1;
@@ -20,6 +21,7 @@
     .glass{backdrop-filter: blur(8px); background: rgba(255,255,255,0.7);} 
     @media (prefers-color-scheme: dark){ .glass{background: rgba(10,15,25,0.6);} }
     .narrative{font-style: italic; opacity:.95}
+    textarea#input{max-height: 160px; overflow:auto;}
   </style>
 </head>
 <body class="scene-bg text-slate-900 dark:text-slate-100">
@@ -58,7 +60,7 @@
 
   <!-- Modal Settings -->
   <dialog id="settings" class="w-full max-w-xl rounded-2xl p-0 backdrop:bg-black/40">
-    <form method="dialog" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden">
+    <form method="dialog" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden" id="settings-form">
       <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <h2 class="text-lg font-semibold">Ajustes del personaje</h2>
         <button class="px-3 py-1 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">Listo</button>
@@ -108,7 +110,10 @@ No tienes que poder con todo hoy.</textarea>
     </div>
   </div>
 
+  <input type="file" id="file-input" accept="application/json" hidden>
+
   <script>
+  // ---------- Estado ----------
   const LS_KEY = 'nv_state_v2';
   const state = loadState();
   function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); } catch{ return defState(); } }
@@ -118,6 +123,7 @@ No tienes que poder con todo hoy.</textarea>
     chat:[], facts:[], story:{scene:'galeria', stage:0, firstRun:true}
   }}
 
+  // ---------- Elementos ----------
   const chatEl=document.getElementById('chat');
   const inputEl=document.getElementById('input');
   const sendBtn=document.getElementById('send');
@@ -125,16 +131,21 @@ No tienes que poder con todo hoy.</textarea>
   const btnClear=document.getElementById('btn-clear');
   const btnExport=document.getElementById('btn-export');
   const btnImport=document.getElementById('btn-import');
+  const fileInput=document.getElementById('file-input');
   const settingsDlg=document.getElementById('settings');
   const btnSettings=document.getElementById('btn-settings');
+  const crisisBar=document.getElementById('crisisbar');
+  const btnCrisisHide=document.getElementById('btn-hide-crisis');
   document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
 
+  // ---------- Init ----------
   renderSettingsFields();
   setScene(state.story.scene);
   hydrateChat();
   if(state.story.firstRun){ introGallery(); state.story.firstRun=false; saveState(); }
   else if(state.chat.length===0){ pushBot(greet()); }
 
+  // ---------- Escenas ----------
   function setScene(scene){
     state.story.scene = scene; saveState();
     let url = state.cfg.imgs.galeria;
@@ -148,7 +159,6 @@ No tienes que poder con todo hoy.</textarea>
     pushNarrative('Él viste sobrio, elegante sin ostentar. Cabello negro largo, recogido con discreción; ojos azules que observan con calma, no con prisa. Se coloca a tu altura, dejando espacio —respetuoso— y su voz, grave con un acento británico suave, rompe el murmullo.');
     pushBot(`"Buenas tardes, ${state.cfg.yourname}." —sonríe apenas— "Todos parecen ver certezas aquí. Tú… pareces buscar la grieta por donde respira el cuadro. ¿Qué te sugiere esta pieza, honestamente?"`);
   }
-
   function toCafe(){
     if(state.story.scene!=='galeria') return;
     setScene('cafe');
@@ -156,7 +166,6 @@ No tienes que poder con todo hoy.</textarea>
     pushNarrative('Él te ofrece la mesa junto al ventanal. Al sentarse, deja la chaqueta en el respaldo, sus manos quedan a la vista —tranquilas—. No invade: su gesto es una invitación, no un asedio.');
     pushBot('"Mi Nona insiste en que hoy pruebe su pastel de naranja. Yo… insistiría en compartirlo contigo, love, si te apetece."');
   }
-
   function toSala(){
     if(state.story.scene!=='cafe') return;
     setScene('sala');
@@ -165,6 +174,7 @@ No tienes que poder con todo hoy.</textarea>
     pushBot('"Solo si te hace bien, nos quedamos aquí un rato. Puedo escucharte… o simplemente sostener tu mano, darling. Tú marcas el compás."');
   }
 
+  // ---------- Mensajería ----------
   function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushNarrative(text){ const msg={role:'narrative', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
@@ -179,16 +189,19 @@ No tienes que poder con todo hoy.</textarea>
     }else{
       bubble.className = (m.role==='user') ? 'max-w-[80%] rounded-2xl px-4 py-3 bg-indigo-600 text-white shadow' : 'max-w-[80%] rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/80 shadow';
     }
-    bubble.innerText = m.text; wrap.appendChild(bubble); chatEl.appendChild(wrap); chatEl.scrollTo({top: chatEl.scrollHeight, behavior:'smooth'});
+    bubble.innerText = m.text; 
+    wrap.appendChild(bubble); chatEl.appendChild(wrap);
+    chatEl.scrollTo({top: chatEl.scrollHeight, behavior:'smooth'});
   }
-
   function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
 
   const APO = ()=> pick(state.cfg.nick)||'love';
   function greet(){ return `Hola, ${state.cfg.yourname}. ${pick(state.cfg.comfort)}`; }
+  const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
 
   function generateReply(userText){
     if(/(ansiedad|p[aá]nico|angusti|trist|llor)/i.test(userText)){
+      showCrisis(true);
       return `${pick(state.cfg.comfort)} Respiremos juntos 4-7-8, ${APO()}. Estoy aquí.`;
     }
     if(/[?¿].+/.test(userText)){
@@ -220,6 +233,80 @@ No tienes que poder con todo hoy.</textarea>
     if(picks.length && Math.random()<0.8){ pushNarrative(picks[Math.floor(Math.random()*picks.length)]); }
   }
 
-  sendBtn.addEventListener('click', onSend);
+  // ---------- UI eventos ----------
+  function onSend(){
+    const text = (inputEl.value||'').trim();
+    if(!text) return;
+    pushUser(text);
+    maybeAmbientNarrative(text);
+    setTimeout(()=>{ pushBot(generateReply(text)); maybeAdvanceStory(); }, 300);
+    inputEl.value=''; autoGrow();
+  }
+
+  // autosize
+  function autoGrow(){ inputEl.style.height='auto'; inputEl.style.height = Math.min(inputEl.scrollHeight, 160)+'px'; }
+  inputEl.addEventListener('input', autoGrow);
   inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSend(); }});
-  likeBtn.addEventListener('click',
+
+  sendBtn.addEventListener('click', onSend);
+  likeBtn.addEventListener('click', ()=> pushBot(pick(['Estoy orgulloso de ti.','Gracias por seguir, incluso cuando cuesta.','Te sostengo aquí, conmigo.'])));
+  btnClear.addEventListener('click', ()=>{
+    if(confirm('¿Borrar el chat?')){ state.chat=[]; saveState(); hydrateChat(); pushBot(greet()); }
+  });
+  btnExport.addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'novio_virtual_memoria.json'; a.click(); URL.revokeObjectURL(a.href);
+  });
+  btnImport.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', async (e)=>{
+    const file = e.target.files?.[0]; if(!file) return;
+    try{
+      const txt = await file.text(); const data = JSON.parse(txt);
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      location.reload();
+    }catch(err){ alert('Archivo inválido'); console.error(err); }
+  });
+
+  // Ajustes
+  btnSettings.addEventListener('click', ()=>{ renderSettingsFields(); settingsDlg.showModal(); });
+  document.getElementById('settings-form').addEventListener('close', saveSettings); // fallback
+  settingsDlg.addEventListener('close', saveSettings);
+
+  function renderSettingsFields(){
+    document.getElementById('cfg-name').value = state.cfg.name;
+    document.getElementById('cfg-yourname').value = state.cfg.yourname;
+    document.getElementById('cfg-nick').value = state.cfg.nick.join('\n');
+    document.getElementById('cfg-comfort').value = state.cfg.comfort.join('\n');
+    document.getElementById('cfg-checkins').checked = !!state.cfg.checkins;
+    document.getElementById('cfg-intense').checked = !!state.cfg.intense;
+    document.getElementById('cfg-img-galeria').value = state.cfg.imgs.galeria;
+    document.getElementById('cfg-img-cafe').value = state.cfg.imgs.cafe;
+    document.getElementById('cfg-img-sala').value = state.cfg.imgs.sala;
+  }
+  function saveSettings(){
+    state.cfg.name = document.getElementById('cfg-name').value.trim() || 'Henry Gackt';
+    state.cfg.yourname = document.getElementById('cfg-yourname').value.trim() || 'Liz';
+    state.cfg.nick = document.getElementById('cfg-nick').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    state.cfg.comfort = document.getElementById('cfg-comfort').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    state.cfg.checkins = document.getElementById('cfg-checkins').checked;
+    state.cfg.intense = document.getElementById('cfg-intense').checked;
+    state.cfg.imgs.galeria = document.getElementById('cfg-img-galeria').value.trim() || state.cfg.imgs.galeria;
+    state.cfg.imgs.cafe = document.getElementById('cfg-img-cafe').value.trim() || state.cfg.imgs.cafe;
+    state.cfg.imgs.sala = document.getElementById('cfg-img-sala').value.trim() || state.cfg.imgs.sala;
+    document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
+    setScene(state.story.scene);
+    saveState();
+  }
+
+  // Crisis helper
+  function showCrisis(show){ crisisBar.classList.toggle('hidden', !show); }
+  btnCrisisHide.addEventListener('click', ()=> showCrisis(false));
+
+  // ---------- PWA ----------
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js'));
+  }
+  </script>
+</body>
+</html>
