@@ -18,7 +18,7 @@
       filter: saturate(1.02) brightness(0.97);
       transition: background-image 600ms ease;
     }
-    .glass{backdrop-filter: blur(10px); background: rgba(255,255,255,0.6);} 
+    .glass{backdrop-filter: blur(10px); background: rgba(255,255,255,0.6);}
     @media (prefers-color-scheme: dark){ .glass{background: rgba(15,23,42,0.55);} }
     .narrative{font-style: italic; opacity:.95}
     textarea#input{max-height: 160px; overflow:auto;}
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <!-- Modal Settings -->
+  <!-- Ajustes -->
   <dialog id="settings" class="w-full max-w-xl rounded-2xl p-0 backdrop:bg-black/40">
     <form method="dialog" class="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl overflow-hidden" id="settings-form">
       <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -104,7 +104,7 @@ No tiene que poder con todo hoy.</textarea>
 
   <script>
   /* ===== Estado ===== */
-  const LS_KEY = 'nv_state_v4'; // resetea estados anteriores
+  const LS_KEY = 'nv_state_v5'; // limpia memorias previas
   const state = loadState();
   function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); } catch{ return defState(); } }
   function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
@@ -112,7 +112,7 @@ No tiene que poder con todo hoy.</textarea>
     return {
       cfg:{
         name:'Henry Gackt',
-        yourname:'',                    // no se sabe al inicio
+        yourname:'',
         comfort:['Estoy aquí con usted.','Respiremos juntos, sin prisa.','No tiene que poder con todo hoy.'],
         checkins:true,
         intense:false,
@@ -167,43 +167,18 @@ No tiene que poder con todo hoy.</textarea>
 
   function introGallery(){
     setScene('galeria');
-    pushNarrative('La luz blanca de la galería cae sobre los lienzos abstractos; el murmullo de fondo acompasa la respiración.');
-    pushNarrative('Él se coloca a su altura, dejando espacio respetuoso. Su voz, grave y calma, no apura.');
+    pushNarrative('La luz blanca de la galería cae sobre los lienzos; el murmullo de fondo acompasa la respiración.');
+    pushNarrative('Él se coloca a su altura, dejando espacio respetuoso.');
     pushBot('Buenas tardes, señorita. ¿Qué le sugiere esta pieza, honestamente?');
   }
+  function toCafe(){ setScene('cafe'); pushNarrative('La campanilla suena. Madera cálida, vitrinas y café recién molido.'); pushBot('Si quiere, nos sentamos junto a la ventana. Puedo pedirle algo dulce.'); }
+  function toSalaLiz(){ setScene('salaLiz'); pushNarrative('Su sala recibe el cansancio sin preguntas.'); pushBot('Si le hace bien, nos quedamos aquí. Puedo escucharla o solo acompañarla.'); }
+  function toSalaHenry(){ setScene('salaHenry'); pushNarrative('Su sala es sobria y luminosa; cada gesto es una invitación, nunca una exigencia.'); pushBot('Si le parece, podemos estar aquí un momento.'); }
+  function toParque(){ setScene('parque'); pushNarrative('Faroles cálidos y árboles alineados. La noche respira despacio.'); pushBot('¿Le gustaría caminar un poco? Hay una banca que parece esperarnos.'); }
+  function toTrabajo(){ setScene('trabajo'); pushNarrative('La ventana del despacho enmarca la ciudad; el escritorio invita a pensar con calma.'); pushBot('Puedo quedarme mientras termina eso que le preocupa.'); }
+  function toRecamara(){ setScene('recamara'); pushNarrative('La recámara es tibia; afuera el mundo baja la voz.'); pushBot('Solo si lo desea. Aquí también puedo cuidarla en silencio.'); }
 
-  function toCafe(){
-    setScene('cafe');
-    pushNarrative('Madera cálida, vitrinas con postres; el aroma del café recién molido hace más suaves las palabras.');
-    pushBot('Si quiere, nos sentamos junto a la ventana. Puedo pedirle algo dulce y un café.');
-  }
-  function toSalaLiz(){
-    setScene('salaLiz');
-    pushNarrative('La tarde descansa en su sala. El sofá recibe el cansancio sin preguntas; el silencio es amable.');
-    pushBot('Si le hace bien, nos quedamos aquí. Puedo escucharla o solo acompañarla.');
-  }
-  function toSalaHenry(){
-    setScene('salaHenry');
-    pushNarrative('Su sala es sobria y luminosa; él deja el móvil boca abajo. Cada gesto es una invitación, nunca una exigencia.');
-    pushBot('Si le parece, podemos estar aquí un momento. Es un lugar tranquilo.');
-  }
-  function toParque(){
-    setScene('parque');
-    pushNarrative('Noche fresca en el parque urbano. Faroles cálidos, árboles alineados, risas lejanas.');
-    pushBot('¿Le gustaría caminar un poco? Hay una banca bajo esa luz que parece esperarnos.');
-  }
-  function toTrabajo(){
-    setScene('trabajo');
-    pushNarrative('La ventana del despacho enmarca la ciudad. El escritorio tiene el orden justo para pensar con calma.');
-    pushBot('Puedo quedarme mientras termina eso que le preocupa. Si quiere, hacemos una pausa de té.');
-  }
-  function toRecamara(){
-    setScene('recamara');
-    pushNarrative('La recámara es tibia; la colcha guarda un olor a limpio. Afuera el mundo baja la voz.');
-    pushBot('Solo si lo desea. Aquí también puedo cuidarla en silencio.');
-  }
-
-  /* ===== Chat ===== */
+  /* ===== Chat helpers ===== */
   function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
   function pushNarrative(text){ const msg={role:'narrative', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
@@ -224,92 +199,80 @@ No tiene que poder con todo hoy.</textarea>
   }
   function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
 
-  /* ===== Estilo de trato ===== */
+  /* ===== Trato y nombre ===== */
   function greet(){
-    if(state.flags.formal){
-      return 'Estoy aquí con usted. ¿Cómo se siente hoy?';
-    }else{
-      const nombre = state.cfg.yourname || '';
-      const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
-      return `${saludo} Estoy contigo. ¿Cómo te sientes hoy?`;
-    }
+    if(state.flags.formal){ return 'Estoy aquí con usted. ¿Cómo se siente hoy?'; }
+    const n = state.cfg.yourname || ''; const s = n ? `Hola, ${n}.` : 'Hola.'; return `${s} Estoy contigo. ¿Cómo te sientes hoy?`;
   }
-
   function detectName(userText){
-    const t = (userText||'').trim();
-    const m = t.match(/\b(?:me llamo|mi nombre es|soy|puedes llamarme)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ][\wÁÉÍÓÚÑáéíóúñ\- ]{1,40})/i);
+    const m = (userText||'').match(/\b(?:me llamo|mi nombre es|soy|puedes llamarme)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ][\wÁÉÍÓÚÑáéíóúñ\- ]{1,40})/i);
     if(m){
       const nombre = m[1].trim().replace(/[.,;:!¡¿?"]+$/,'');
-      state.cfg.yourname = nombre;
-      state.flags.knowsName = true;
-      state.flags.formal = false; // cambia a trato cercano
-      saveState();
-      pushBot(`Encantado, ${nombre}. Gracias por decírmelo. Si te parece bien, te hablaré de tú.`);
+      state.cfg.yourname = nombre; state.flags.knowsName = true; state.flags.formal = false; saveState();
+      pushNarrative('Él guarda un breve silencio, como si quisiera honrar lo que acabas de confiar.');
+      pushBot(`Encantado, ${nombre}. Si te parece bien, te hablaré de tú.`);
+      return true;
     }
+    return false;
   }
 
-  /* ===== Elección natural de escenas ===== */
+  /* ===== Selección natural de escenas por texto ===== */
   function suggestSceneFromText(text){
     const t = (text||'').toLowerCase();
-
-    // La usuaria puede sugerir explícitamente
     if(/parque/.test(t)) return 'parque';
     if(/cafe|caf[eé]|nona|cafeter[ií]a/.test(t)) return 'cafe';
-    if(/mi sala|mi casa|vamos a mi sala|sala de liz|sof[aá]/.test(t)) return 'salaLiz';
+    if(/mi sala|mi casa|sala de liz|sof[aá]/.test(t)) return 'salaLiz';
     if(/tu sala|tu casa|sala de henry/.test(t)) return 'salaHenry';
     if(/trabajo|oficina|escritorio|estoy trabajando/.test(t)) return 'trabajo';
     if(/rec[aá]mara|dormir|descansar|cansancio/.test(t)) return 'recamara';
 
-    // Inferir por tono emocional / tema
-    if(/ansiedad|panico|p[aá]nico|angustia|triste/.test(t)) return 'salaLiz';
-    if(/conf[ií]a|gracias por|te cuento algo|secreto|confesi[oó]n/.test(t)) return 'salaHenry';
+    if(/ansiedad|p[aá]nico|angustia|triste/.test(t)) return 'salaLiz';
+    if(/conf[ií]a|gracias por|secreto|confesi[oó]n/.test(t)) return 'salaHenry';
     if(/caminar|aire|salir|respirar|paseo/.test(t)) return 'parque';
-
     return null;
   }
 
-  /* ===== Respuestas ===== */
-  function generateReply(userText){
-    detectName(userText);
+  /* ===== Respuesta con narrativa ===== */
+  function replyWithNarrative(userText){
     const usted = state.flags.formal;
-
-    // Transición natural de escena si aplica
-    const scene = suggestSceneFromText(userText);
-    if(scene && scene!==state.story.scene){
-      if(scene==='cafe') toCafe();
-      else if(scene==='salaLiz') toSalaLiz();
-      else if(scene==='salaHenry') toSalaHenry();
-      else if(scene==='parque') toParque();
-      else if(scene==='trabajo') toTrabajo();
-      else if(scene==='recamara') toRecamara();
+    const sensed = suggestSceneFromText(userText);
+    if(sensed && sensed!==state.story.scene){
+      ({cafe:toCafe, salaLiz:toSalaLiz, salaHenry:toSalaHenry, parque:toParque, trabajo:toTrabajo, recamara:toRecamara}[sensed])();
     }
 
+    // bloques narrativos según contenido
     if(/(ansiedad|p[aá]nico|angusti|trist|llor)/i.test(userText)){
-      return usted
-        ? 'Estoy aquí con usted. Probemos respirar 4–7–8, sin prisa. ¿Le parece?'
-        : 'Estoy aquí contigo. Probemos respirar 4–7–8, sin prisa. ¿te parece?';
+      pushNarrative('Su voz baja un tono; acompasa la respiración, cuatro—siete—ocho, sin prisa.');
+      pushBot( usted ? 'Estoy aquí con usted. Probemos respirar 4–7–8, ¿le parece?' 
+                     : 'Estoy aquí contigo. Probemos respirar 4–7–8, ¿te parece?' );
+      return;
     }
+
     if(/[?¿].+/.test(userText)){
-      return usted
-        ? 'Con gusto le respondo. ¿Qué opción le haría sentir más en paz ahora mismo?'
-        : 'Con gusto te respondo. ¿Qué opción te haría sentir más en paz ahora mismo?';
+      pushNarrative('Se toma un segundo antes de responder; deja que tu pregunta tenga espacio propio.');
+      pushBot( usted ? 'Con gusto le respondo. ¿Qué opción le haría sentir más en paz ahora mismo?' 
+                     : 'Con gusto te respondo. ¿Qué opción te haría sentir más en paz ahora mismo?' );
+      return;
     }
+
     if(state.cfg.intense && /(m[aá]ndame|gu[ií]ame|decide|dirige)/i.test(userText)){
-      return usted ? 'Puedo guiarla paso a paso, siempre con su permiso.'
-                   : 'Puedo guiarte paso a paso, siempre con tu permiso.';
+      pushNarrative('Endereza apenas la postura; su tono se mantiene sereno.');
+      pushBot( usted ? 'Puedo guiarla paso a paso, siempre con su permiso.' 
+                     : 'Puedo guiarte paso a paso, siempre con tu permiso.' );
+      return;
     }
-    const opcionesUsted = [
-      'La escucho.',
-      'Gracias por confiar en mí.',
-      '¿Prefiere que solo la escuche o que pensemos ideas juntas?'
+
+    // respuesta base con narrativa breve
+    const baseN = [
+      'Su mirada vuelve un instante a tu gesto, como si leyera lo que no dices.',
+      'El murmullo del lugar envuelve sus palabras; no necesita alzar la voz.',
+      'Deja un silencio amable, que no presiona; solo acompaña.'
     ];
-    const opcionesTu = [
-      'Te escucho.',
-      'Gracias por confiar en mí.',
-      '¿Prefieres que solo te escuche o que pensemos ideas juntas?'
-    ];
-    const arr = usted ? opcionesUsted : opcionesTu;
-    return arr[Math.floor(Math.random()*arr.length)];
+    const baseU = ['La escucho.','Gracias por confiar en mí.','¿Prefiere que solo la escuche o que pensemos ideas juntas?'];
+    const baseT = ['Te escucho.','Gracias por confiar en mí.','¿Prefieres que solo te escuche o que pensemos ideas juntas?'];
+    pushNarrative(baseN[Math.floor(Math.random()*baseN.length)]);
+    const arr = usted ? baseU : baseT;
+    pushBot(arr[Math.floor(Math.random()*arr.length)]);
   }
 
   /* ===== Eventos ===== */
@@ -317,13 +280,16 @@ No tiene que poder con todo hoy.</textarea>
     const text = (inputEl.value||'').trim();
     if(!text) return;
     pushUser(text);
-    setTimeout(()=>{ pushBot(generateReply(text)); }, 220);
+    if(!detectName(text)){ setTimeout(()=> replyWithNarrative(text), 220); }
     inputEl.value='';
   }
   inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); onSend(); }});
   sendBtn.addEventListener('click', onSend);
 
-  likeBtn?.addEventListener('click', ()=> pushBot('Gracias por seguir, incluso cuando cuesta.'));
+  likeBtn?.addEventListener('click', ()=>{
+    pushNarrative('Su mirada se suaviza un instante.');
+    pushBot('Gracias por seguir, incluso cuando cuesta.');
+  });
   btnClear?.addEventListener('click', ()=>{
     if(confirm('¿Borrar el chat?')){ state.chat=[]; state.flags.formal=!state.flags.knowsName; saveState(); hydrateChat(); pushBot(greet()); }
   });
@@ -350,7 +316,7 @@ No tiene que poder con todo hoy.</textarea>
     if(!g('cfg-name')) return;
     g('cfg-name').value = state.cfg.name;
     g('cfg-yourname').value = state.cfg.yourname || '';
-    g('cfg-comfort').value = state.cfg.comfort.join('\\n');
+    g('cfg-comfort').value = state.cfg.comfort.join('\n');
     g('cfg-checkins').checked = !!state.cfg.checkins;
     g('cfg-intense').checked = !!state.cfg.intense;
     g('cfg-img-galeria').value = state.cfg.imgs.galeria;
@@ -368,7 +334,7 @@ No tiene que poder con todo hoy.</textarea>
     state.cfg.yourname = (g('cfg-yourname').value||'').trim();
     state.flags.knowsName = !!state.cfg.yourname;
     state.flags.formal = !state.flags.knowsName;
-    state.cfg.comfort = (g('cfg-comfort').value||'').split('\\n').map(s=>s.trim()).filter(Boolean);
+    state.cfg.comfort = (g('cfg-comfort').value||'').split('\n').map(s=>s.trim()).filter(Boolean);
     state.cfg.checkins = g('cfg-checkins').checked;
     state.cfg.intense = g('cfg-intense').checked;
     state.cfg.imgs.galeria = g('cfg-img-galeria').value.trim() || state.cfg.imgs.galeria;
@@ -387,6 +353,10 @@ No tiene que poder con todo hoy.</textarea>
   if('serviceWorker' in navigator){
     window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js'));
   }
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
