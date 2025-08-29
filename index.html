@@ -1,122 +1,282 @@
-<script>
-/* ===== Estado ===== */
-const LS_KEY = 'nv_state_v6'; // limpia memorias previas
-const state = loadState();
-function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); } catch{ return defState(); } }
-function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-function defState(){ 
-  return {
-    cfg:{
-      name:'Henry Gackt',
-      yourname:'',
-      comfort:['Estoy aquí con usted.','Respiremos juntos, sin prisa.','No tiene que poder con todo hoy.'],
-      checkins:true,
-      intense:false,
-      imgs:{
-        galeria:'escena_galeria.jpg',
-        cafe:'escena_cafeteria.jpg',
-        salaHenry:'escena_sala.jpg',
-        salaLiz:'escena_sala_liz.jpg',
-        trabajo:'escena_trabajo.jpg',
-        recamara:'escena_recamara.jpg',
-        parque:'escena_parque.jpg'
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Novio Virtual — Henry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --bg-img: url('escena_galeria.jpg'); }
+    body{
+      min-height:100vh;
+      background-image: var(--bg-img), linear-gradient(180deg,#eaeef6, #cfd8e3);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .glass{ backdrop-filter: blur(8px); background-color: rgba(255,255,255,.75); }
+    .darkglass{ backdrop-filter: blur(8px); background-color: rgba(15,23,42,.75); }
+    .bubble-user{ max-width:80%; border-radius:1.25rem; padding:.75rem 1rem; background:#4f46e5; color:white; box-shadow:0 6px 20px rgba(0,0,0,.15); }
+    .bubble-bot{ max-width:90%; border-radius:1.25rem; padding:.75rem 1rem; background:rgba(255,255,255,.85); color:#0f172a; box-shadow:0 6px 20px rgba(0,0,0,.15); white-space:pre-wrap; }
+  </style>
+</head>
+<body class="h-full">
+  <!-- Barra superior -->
+  <header class="glass dark:darkglass sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="text-xl font-semibold">Henry</div>
+      <div id="nv-name-label" class="text-sm opacity-70"></div>
+      <div class="ml-auto flex items-center gap-2">
+        <button id="btn-settings" class="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-white">Ajustes</button>
+        <button id="btn-like" class="px-3 py-1.5 rounded-xl border border-pink-300 hover:bg-white">❤️</button>
+        <button id="btn-export" class="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-white">Exportar</button>
+        <button id="btn-import" class="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-white">Importar</button>
+        <input id="file-input" type="file" accept="application/json" class="hidden" />
+        <button id="btn-clear" class="px-3 py-1.5 rounded-xl border border-red-300 hover:bg-white">Borrar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Chat -->
+  <main class="max-w-5xl mx-auto px-4">
+    <div id="chat" class="mt-6 flex flex-col gap-3"></div>
+  </main>
+
+  <!-- Input -->
+  <footer class="glass dark:darkglass sticky bottom-0">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex gap-2">
+      <input id="input" type="text" placeholder="Escribe aquí… (usa *texto* para narrativa)"
+             class="flex-1 px-4 py-3 rounded-xl border border-slate-300" />
+      <button id="send" class="px-4 py-3 rounded-xl bg-indigo-600 text-white">Enviar</button>
+    </div>
+  </footer>
+
+  <!-- Ajustes -->
+  <dialog id="settings" class="rounded-2xl p-0 w-[min(560px,92vw)]">
+    <div class="p-5 glass">
+      <h2 class="text-lg font-semibold mb-3">Ajustes rápidos</h2>
+      <div class="grid grid-cols-1 gap-3">
+        <label class="block">
+          <span class="text-sm">Tu nombre (para trato de “tú”)</span>
+          <input id="set-yourname" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300" />
+        </label>
+        <label class="block">
+          <span class="text-sm">Escena inicial</span>
+          <select id="set-scene" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300">
+            <option value="galeria">Galería</option>
+            <option value="cafe">Cafetería</option>
+            <option value="salaHenry">Sala de Henry</option>
+            <option value="salaLiz">Sala de Liz</option>
+            <option value="trabajo">Trabajo</option>
+            <option value="recamara">Recámara</option>
+            <option value="parque">Parque</option>
+          </select>
+        </label>
+        <div class="flex justify-end gap-2 mt-2">
+          <button id="set-close" class="px-3 py-2 rounded-lg border">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    /* ===== Estado ===== */
+    const LS_KEY = 'nv_state_v6';
+    const state = loadState();
+
+    function loadState(){
+      try{ return JSON.parse(localStorage.getItem(LS_KEY)) || defState(); }
+      catch{ return defState(); }
+    }
+    function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+    function defState(){ 
+      return {
+        cfg:{
+          name:'Henry Gackt',
+          yourname:'',
+          comfort:['Estoy aquí con usted.','Respiremos juntos, sin prisa.','No tiene que poder con todo hoy.'],
+          checkins:true,
+          intense:false,
+          imgs:{
+            galeria:'escena_galeria.jpg',
+            cafe:'escena_cafeteria.jpg',
+            salaHenry:'escena_sala.jpg',
+            salaLiz:'escena_sala_liz.jpg',
+            trabajo:'escena_trabajo.jpg',
+            recamara:'escena_recamara.jpg',
+            parque:'escena_parque.jpg'
+          }
+        },
+        chat:[],
+        flags:{knowsName:false, formal:true},
+        story:{scene:'galeria', firstRun:true}
       }
-    },
-    chat:[],
-    flags:{knowsName:false, formal:true},
-    story:{scene:'galeria', firstRun:true}
-  }
-}
+    }
 
-/* ===== Elementos ===== */
-const chatEl=document.getElementById('chat');
-const inputEl=document.getElementById('input');
-const sendBtn=document.getElementById('send');
-const likeBtn=document.getElementById('btn-like');
-const btnClear=document.getElementById('btn-clear');
-const btnExport=document.getElementById('btn-export');
-const btnImport=document.getElementById('btn-import');
-const fileInput=document.getElementById('file-input');
-const settingsDlg=document.getElementById('settings');
-const btnSettings=document.getElementById('btn-settings');
-document.getElementById('nv-name-label').textContent = '• ' + state.cfg.name;
+    /* ===== Elementos ===== */
+    const chatEl = document.getElementById('chat');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const likeBtn = document.getElementById('btn-like');
+    const btnClear = document.getElementById('btn-clear');
+    const btnExport = document.getElementById('btn-export');
+    const btnImport = document.getElementById('btn-import');
+    const fileInput = document.getElementById('file-input');
+    const settingsDlg = document.getElementById('settings');
+    const btnSettings = document.getElementById('btn-settings');
+    const nameLbl = document.getElementById('nv-name-label');
 
-/* ===== Init ===== */
-renderSettingsFields();
-setScene(state.story.scene);
-hydrateChat();
-if(state.story.firstRun){ introGallery(); state.story.firstRun=false; saveState(); }
-else if(state.chat.length===0){ pushBot(greet()); }
+    if(nameLbl) nameLbl.textContent = '• ' + state.cfg.name;
 
-/* ===== Escenas ===== */
-function setScene(scene){
-  state.story.scene = scene; saveState();
-  let url = state.cfg.imgs.galeria;
-  if(scene==='cafe') url = state.cfg.imgs.cafe;
-  else if(scene==='salaHenry') url = state.cfg.imgs.salaHenry;
-  else if(scene==='salaLiz') url = state.cfg.imgs.salaLiz;
-  else if(scene==='trabajo') url = state.cfg.imgs.trabajo;
-  else if(scene==='recamara') url = state.cfg.imgs.recamara;
-  else if(scene==='parque') url = state.cfg.imgs.parque;
-  document.documentElement.style.setProperty('--bg-img', `url('${url}')`);
-}
+    /* ===== Init ===== */
+    renderSettingsFields();
+    setScene(state.story.scene);
+    hydrateChat();
+    if(state.story.firstRun){ introGallery(); state.story.firstRun=false; saveState(); }
+    else if(state.chat.length===0){ pushBot(greet()); }
 
-function introGallery(){
-  setScene('galeria');
-  speak('La luz blanca de la galería cae sobre los lienzos; el murmullo de fondo acompasa la respiración',
-        'Buenas tardes, señorita. ¿Qué le sugiere esta pieza, honestamente?');
-}
-function toCafe(){ setScene('cafe'); speak('La campanilla suena. Madera cálida, vitrinas y café recién molido','Si quiere, nos sentamos junto a la ventana. Puedo pedirle algo dulce'); }
-function toSalaLiz(){ setScene('salaLiz'); speak('Su sala recibe el cansancio sin preguntas','Si le hace bien, nos quedamos aquí. Puedo escucharla o solo acompañarla'); }
-function toSalaHenry(){ setScene('salaHenry'); speak('Su sala es sobria y luminosa; cada gesto es una invitación, nunca una exigencia','Si le parece, podemos estar aquí un momento'); }
-function toParque(){ setScene('parque'); speak('Faroles cálidos y árboles alineados. La noche respira despacio','¿Le gustaría caminar un poco? Hay una banca que parece esperarnos'); }
-function toTrabajo(){ setScene('trabajo'); speak('La ventana del despacho enmarca la ciudad; el escritorio invita a pensar con calma','Puedo quedarme mientras termina eso que le preocupa'); }
-function toRecamara(){ setScene('recamara'); speak('La recámara es tibia; afuera el mundo baja la voz','Solo si lo desea. Aquí también puedo cuidarla en silencio'); }
+    /* ===== Escenas ===== */
+    function setScene(scene){
+      state.story.scene = scene; saveState();
+      let url = state.cfg.imgs.galeria;
+      if(scene==='cafe') url = state.cfg.imgs.cafe;
+      else if(scene==='salaHenry') url = state.cfg.imgs.salaHenry;
+      else if(scene==='salaLiz') url = state.cfg.imgs.salaLiz;
+      else if(scene==='trabajo') url = state.cfg.imgs.trabajo;
+      else if(scene==='recamara') url = state.cfg.imgs.recamara;
+      else if(scene==='parque') url = state.cfg.imgs.parque;
+      document.documentElement.style.setProperty('--bg-img', `url('${url}')`);
+    }
 
-/* ===== Chat helpers ===== */
-function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
-function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
-function appendBubble(m){
-  const wrap=document.createElement('div');
-  wrap.className= m.role==='user' ? 'flex justify-end' : 'flex justify-start';
-  const bubble=document.createElement('div');
-  bubble.className = (m.role==='user') ? 'max-w-[80%] rounded-2xl px-4 py-3 bg-indigo-600 text-white shadow' 
-                                       : 'max-w-[90%] rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/80 shadow';
-  bubble.innerText = m.text; 
-  wrap.appendChild(bubble); chatEl.appendChild(wrap);
-  chatEl.scrollTo({top: chatEl.scrollHeight, behavior:'smooth'});
-}
-function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
+    function introGallery(){
+      setScene('galeria');
+      speak(
+        'La luz blanca de la galería cae sobre los lienzos; el murmullo de fondo acompasa la respiración',
+        'Buenas tardes, señorita. ¿Qué le sugiere esta pieza, honestamente?'
+      );
+    }
+    function toCafe(){ setScene('cafe'); speak('La campanilla suena. Madera cálida, vitrinas y café recién molido','Si quiere, nos sentamos junto a la ventana. Puedo pedirle algo dulce'); }
+    function toSalaLiz(){ setScene('salaLiz'); speak('Su sala recibe el cansancio sin preguntas','Si le hace bien, nos quedamos aquí. Puedo escucharla o solo acompañarla'); }
+    function toSalaHenry(){ setScene('salaHenry'); speak('Su sala es sobria y luminosa; cada gesto es una invitación, nunca una exigencia','Si le parece, podemos estar aquí un momento'); }
+    function toParque(){ setScene('parque'); speak('Faroles cálidos y árboles alineados. La noche respira despacio','¿Le gustaría caminar un poco? Hay una banca que parece esperarnos'); }
+    function toTrabajo(){ setScene('trabajo'); speak('La ventana del despacho enmarca la ciudad; el escritorio invita a pensar con calma','Puedo quedarme mientras termina eso que le preocupa'); }
+    function toRecamara(){ setScene('recamara'); speak('La recámara es tibia; afuera el mundo baja la voz','Solo si lo desea. Aquí también puedo cuidarla en silencio'); }
 
-/* ===== Habla fluida ===== */
-// Un solo mensaje: *narrativa* + “diálogo”
-function speak(narr, line){
-  const n = narr ? `*${narr}*\n` : '';
-  pushBot(`${n}“${line}”`);
-}
+    /* ===== Chat helpers ===== */
+    function pushUser(text){ const msg={role:'user', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
+    function pushBot(text){ const msg={role:'bot', text, ts:Date.now()}; state.chat.push(msg); saveState(); appendBubble(msg); }
+    function appendBubble(m){
+      const wrap=document.createElement('div');
+      wrap.className= m.role==='user' ? 'flex justify-end' : 'flex justify-start';
+      const bubble=document.createElement('div');
+      bubble.className = (m.role==='user') ? 'bubble-user' : 'bubble-bot';
+      bubble.innerText = m.text;
+      wrap.appendChild(bubble); chatEl.appendChild(wrap);
+      chatEl.scrollTo({top: chatEl.scrollHeight, behavior:'smooth'});
+    }
+    function hydrateChat(){ chatEl.innerHTML=''; state.chat.forEach(appendBubble); chatEl.scrollTo({top: chatEl.scrollHeight}); }
 
-/* ===== Trato y nombre ===== */
-function greet(){
-  if(state.flags.formal){ return 'Estoy aquí con usted. ¿Cómo se siente hoy?'; }
-  const n = state.cfg.yourname || ''; 
-  const s = n ? `Hola, ${n}.` : 'Hola.'; 
-  return `${s} Estoy contigo. ¿Cómo te sientes hoy?`;
-}
-function detectName(userText){
-  const m = (userText||'').match(/\b(?:me llamo|mi nombre es|soy|puedes llamarme)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ][\wÁÉÍÓÚÑáéíóúñ\- ]{1,40})/i);
-  if(m){
-    const nombre = m[1].trim().replace(/[.,;:!¡¿?"]+$/,'');
-    state.cfg.yourname = nombre; state.flags.knowsName = true; state.flags.formal = false; saveState();
-    speak('Él inclina apenas la cabeza, como si quisiera honrar lo que acabas de confiar',
-          `Encantado, ${nombre}. Si te parece bien, a partir de ahora te hablaré de tú`);
-    return true;
-  }
-  return false;
-}
+    /* ===== Habla fluida ===== */
+    function speak(narr, line){
+      const n = narr ? `*${narr}*\n` : '';
+      pushBot(`${n}“${line}”`);
+    }
 
-/* ===== Selección natural de escenas ===== */
-function suggestSceneFromText(text){
-  const t = (text||'').toLowerCase();
-  if(/parque/.test(t)) return 'parque';
-  if(/cafe|caf[eé]|nona|cafeter[ií]a/.test(t)) return 'cafe';
-  if(/mi sala|mi casa|sala de liz|sof[aá]/.test(t)) return
+    /* ===== Trato y nombre ===== */
+    function greet(){
+      if(state.flags.formal){ return 'Estoy aquí con usted. ¿Cómo se siente hoy?'; }
+      const n = state.cfg.yourname || ''; 
+      const s = n ? `Hola, ${n}.` : 'Hola.'; 
+      return `${s} Estoy contigo. ¿Cómo te sientes hoy?`;
+    }
+    function detectName(userText){
+      const m = (userText||'').match(/\b(?:me llamo|mi nombre es|soy|puedes llamarme)\s+([A-Za-zÁÉÍÓÚÑáéíóúñ][\wÁÉÍÓÚÑáéíóúñ\- ]{1,40})/i);
+      if(m){
+        const nombre = m[1].trim().replace(/[.,;:!¡¿?"]+$/,'');
+        state.cfg.yourname = nombre; state.flags.knowsName = true; state.flags.formal = false; saveState();
+        speak('Él inclina apenas la cabeza, como si quisiera honrar lo que acabas de confiar',
+              `Encantado, ${nombre}. Si te parece bien, a partir de ahora te hablaré de tú`);
+        return true;
+      }
+      return false;
+    }
+
+    /* ===== Selección natural de escenas (básica) ===== */
+    function suggestSceneFromText(text){
+      const t = (text||'').toLowerCase();
+      if(/parque/.test(t)) return 'parque';
+      if(/cafe|caf[eé]|nona|cafeter[ií]a/.test(t)) return 'cafe';
+      if(/mi sala|mi casa|sala de liz|sof[aá]/.test(t)) return 'salaLiz';
+      if(/tu sala|sala de henry/.test(t)) return 'salaHenry';
+      if(/trabajo|oficina|escritorio/.test(t)) return 'trabajo';
+      if(/rec[aá]mara|dormitorio|cama/.test(t)) return 'recamara';
+      if(/galer[ií]a|museo|cuadro/.test(t)) return 'galeria';
+      return null;
+    }
+
+    /* ===== Eventos ===== */
+    sendBtn.addEventListener('click', onSend);
+    inputEl.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); onSend(); } });
+    btnClear.addEventListener('click', () => { state.chat=[]; saveState(); hydrateChat(); pushBot(greet()); });
+    likeBtn.addEventListener('click', () => { pushBot('“Gracias.” Él sonríe leve, como si el gesto le importara más que las palabras'); });
+    btnExport.addEventListener('click', exportState);
+    btnImport.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', importState);
+    btnSettings.addEventListener('click', () => settingsDlg.showModal());
+    document.getElementById('set-close').addEventListener('click', () => settingsDlg.close());
+    document.getElementById('set-scene').addEventListener('change', (e)=> setScene(e.target.value));
+    document.getElementById('set-yourname').addEventListener('change', (e)=> { state.cfg.yourname=e.target.value; state.flags.formal = !!e.target.value ? false : state.flags.formal; saveState(); });
+
+    function onSend(){
+      const text = (inputEl.value || '').trim();
+      if(!text) return;
+      pushUser(text);
+      if(!detectName(text)){
+        const s = suggestSceneFromText(text);
+        if(s) {
+          if(s==='cafe') toCafe();
+          else if(s==='salaLiz') toSalaLiz();
+          else if(s==='salaHenry') toSalaHenry();
+          else if(s==='parque') toParque();
+          else if(s==='trabajo') toTrabajo();
+          else if(s==='recamara') toRecamara();
+          else setScene('galeria');
+        } else {
+          speak('', 'Le escucho. Dígame qué necesita ahora.');
+        }
+      }
+      inputEl.value='';
+    }
+
+    /* ===== Exportar / Importar ===== */
+    function exportState(){
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'henry_state.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    async function importState(evt){
+      const f = evt.target.files && evt.target.files[0];
+      if(!f) return;
+      const txt = await f.text();
+      try{
+        const data = JSON.parse(txt);
+        localStorage.setItem(LS_KEY, JSON.stringify(data));
+        location.reload();
+      }catch(e){ alert('Archivo inválido'); }
+    }
+
+    /* ===== Ajustes UI ===== */
+    function renderSettingsFields(){
+      const yourname = document.getElementById('set-yourname');
+      const sceneSel = document.getElementById('set-scene');
+      if(yourname) yourname.value = state.cfg.yourname || '';
+      if(sceneSel) sceneSel.value = state.story.scene || 'galeria';
+    }
+  });
+  </script>
+</body>
+</html>
